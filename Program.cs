@@ -10,19 +10,23 @@ namespace H5Chocolate
             List<Chocolate> chocolateDatabase = GenerateTestData();
 
             Order order = new Order();
-            Console.WriteLine("Välkommen till H5ChocolateCOS!");
+
+            Console.Clear();
+            Console.WriteLine(
+                "------------------------------------------\n" +
+                "| Välkommen till H5Chocolate Ordersystem |\n" +
+                "------------------------------------------");
 
             while (true)
             {
-                Console.WriteLine("Välj en produkt:");
+                Console.WriteLine("Välj en produkt:\n");
                 foreach (Chocolate c in chocolateDatabase)
                 {
-                    System.Console.WriteLine($"[{chocolateDatabase.IndexOf(c)}]: {c.name}");
+                    Console.WriteLine($"[{chocolateDatabase.IndexOf(c)}]: {c.name}");
                 }
-                Console.WriteLine("[B] Lägg beställning");
-                Console.WriteLine("[A] Avsluta");
+                Console.WriteLine("\n[B] Lägg beställning   [A] Avsluta");
 
-                Console.Write("Val: ");
+                Console.Write("\nVal: ");
                 string input = Console.ReadLine().ToUpper();
 
                 if (input == "B" && order.HasChocolate())
