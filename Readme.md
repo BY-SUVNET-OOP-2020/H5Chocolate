@@ -1,23 +1,7 @@
-Chocolate 
-	string name
-    int cacaoAmount
- 	int milkAmount
- 	List<Filling> filling
- 	double CalculatePrice()
+# H5Chocolate
 
-Order
-	string message
-	Address adress
-	bool confirmed
- 	Package package
- 	List<Chocolate > items
-	Donation donation
-	bool Confirm()
-bool Cancel()
+H5Chocolate tillverkar chokladkakor med olika mängd kakao, mjölk och utfyllnad.
+Nu vill dom skapa en hemsida där man kan beställa egna chokladkakor som skickas direkt hem till en adress, i valfri presentförpackning och med en hälsning på paketet, som man ska kunna skriva in på hemsidan. Chokladen är gratis, men beställaren måste ange en organisation att donera en valfri summa pengar till för att kunna beställa. 
 
-Customer
-	int id
- 	string name
- 	List<Order> orders
 
 
