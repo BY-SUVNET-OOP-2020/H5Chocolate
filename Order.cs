@@ -1,50 +1,53 @@
 using System;
 using System.Collections.Generic;
 
-public class Order
+namespace H5Chocolate
 {
-    //public string message; //TODO: Lägg till funktionalitet för att lägga in meddelande
-    //public Address adress; //TODO: Lägg till klass
-    //public Package package; //TODO: Lägg till klass
-    public bool confirmed;
-    private List<Chocolate> items = new List<Chocolate>();
-
-    public Donation donation;
-
-    public void AddChocolate(Chocolate chocolate)
+    public class Order
     {
-        items.Add(chocolate);
-        Console.WriteLine("[Chocolate ordered]");
-    }
+        //public string message; //TODO: Lägg till funktionalitet för att lägga in meddelande
+        //public Address adress; //TODO: Lägg till klass
+        //public Package package; //TODO: Lägg till klass
+        public bool confirmed;
+        private List<Chocolate> items = new List<Chocolate>();
 
-    public string GetOrderList()
-    {
-        string output = "";
-        foreach (Chocolate item in items)
+        public Donation donation;
+
+        public void AddChocolate(Chocolate chocolate)
         {
-            output += item.name + ", ";
+            items.Add(chocolate);
+            Console.WriteLine("[Chocolate ordered]");
         }
 
-        return output;
-    }
-
-    public bool HasChocolate()
-    {
-        return items.Count > 0;
-    }
-
-    public bool IsConfirmable()
-    {
-        return items.Count > 0 && donation != null;
-    }
-
-    public bool Confirm()
-    {
-        if (IsConfirmable())
+        public string GetOrderList()
         {
-            confirmed = true;
+            string output = "";
+            foreach (Chocolate item in items)
+            {
+                output += item.name + ", ";
+            }
+
+            return output;
         }
 
-        return confirmed;
+        public bool HasChocolate()
+        {
+            return items.Count > 0;
+        }
+
+        public bool IsConfirmable()
+        {
+            return items.Count > 0 && donation != null;
+        }
+
+        public bool Confirm()
+        {
+            if (IsConfirmable())
+            {
+                confirmed = true;
+            }
+
+            return confirmed;
+        }
     }
 }

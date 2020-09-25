@@ -34,9 +34,9 @@ namespace H5Chocolate
                     Console.WriteLine("Välj organisation för att gå vidare:");
 
                     Donation donation = new Donation();
-                    donation.organization = "BY";
+                    donation.Organization = "BY";
 
-                    Console.WriteLine($"Vald organisation: {donation.organization}");
+                    Console.WriteLine($"Vald organisation: {donation.Organization}");
                     Console.Write("Summa: ");
                     donation.amount = Convert.ToInt32(Console.ReadLine());
 
