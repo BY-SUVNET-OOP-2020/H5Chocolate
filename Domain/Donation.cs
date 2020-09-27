@@ -11,10 +11,11 @@ namespace H5Chocolate
             {
                 return organization;
             }
-            set
-            {
-                organization = value;
-            }
+        }
+
+        public Donation(string organization)
+        {
+            this.organization = organization;
         }
     }
 }

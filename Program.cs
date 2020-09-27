@@ -1,5 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
+using Faker;
+using Console = Colorful.Console;
+using System.Drawing;
+using System.Runtime.Serialization;
 
 namespace H5Chocolate
 {
@@ -7,34 +11,28 @@ namespace H5Chocolate
     {
         static void Main()
         {
-            List<Chocolate> chocolateDatabase = GenerateTestData();
+            List<Product> productDatabase = GenerateFakeProducts();
+            List<string> organizationDatabase = GenerateFakeOrganizations();
 
-            Order order = new Order();
-
-            Console.Clear();
-            Console.WriteLine(
-                "------------------------------------------\n" +
-                "| Välkommen till H5Chocolate Ordersystem |\n" +
-                "------------------------------------------");
+            Random random = new Random();
+            Order order = new Order(random.Next(1000, 100000));
 
             while (true)
             {
-                Console.WriteLine("Välj en produkt:\n");
-                foreach (Chocolate c in chocolateDatabase)
-                {
-                    Console.WriteLine($"[{chocolateDatabase.IndexOf(c)}]: {c.name}");
-                }
+                PrintWelcomeMessage();
+                PrintProducts(productDatabase);
+                PrintCurrentOrder(order);
+
                 Console.WriteLine("\n[B] Lägg beställning   [A] Avsluta");
 
-                Console.Write("\nVal: ");
+                Console.Write("\n:> ");
                 string input = Console.ReadLine().ToUpper();
 
-                if (input == "B" && order.HasChocolate())
+                if (input == "B")
                 {
-                    Console.WriteLine("Välj organisation för att gå vidare:");
+                    Console.WriteLine("Välj organisation att donera till:");
 
-                    Donation donation = new Donation();
-                    donation.Organization = "BY";
+                    Donation donation = new Donation("BY");
 
                     Console.WriteLine($"Vald organisation: {donation.Organization}");
                     Console.Write("Summa: ");
@@ -46,13 +44,12 @@ namespace H5Chocolate
                     if (orderSuccesfull)
                     {
                         Console.WriteLine("Beställning skickad! Tack!");
+                        Console.ReadLine();
                     }
                 }
                 else if (input == "B" && !order.IsConfirmable())
                 {
-                    Console.ForegroundColor = ConsoleColor.Red;
-                    Console.WriteLine("Något gick fel!");
-                    Console.ResetColor();
+                    Console.WriteLine("Något gick fel!", Color.Red);
                 }
                 else if (input == "A")
                 {
@@ -61,37 +58,72 @@ namespace H5Chocolate
                 else
                 {
                     int index = Convert.ToInt32(input);
-                    order.AddChocolate(chocolateDatabase[index]);
-
-                    Console.WriteLine($"Du har beställt: {order.GetOrderList()}");
+                    order.AddProduct(productDatabase[index]);
                 }
-                Console.WriteLine("------------");
             }
         }
 
-        private static List<Chocolate> GenerateTestData()
+        private static void PrintCurrentOrder(Order order)
         {
-            List<Chocolate> chocolateDatabase = new List<Chocolate>();
+            Console.WriteLine("----------------------------------");
+            Console.WriteLine($"{order.Count} produkter i ordern:");
+            Console.WriteLine(order.GetOrderedItemsAsString());
+            Console.WriteLine("----------------------------------");
+        }
 
-            Chocolate chocolate = new Chocolate();
-            chocolate.name = "Hockeypulverchokladkaka";
-            chocolate.cacaoAmount = 4;
-            chocolate.milkAmount = 12;
-            chocolate.filling.Add("Hockeypulver");
-            chocolate.filling.Add("Havregryn");
+        private static void PrintWelcomeMessage()
+        {
+            string catchPhrase = Faker.Company.CatchPhrase();
+            Console.Clear();
+            /* fixformat ignore:start */
+            Console.WriteLine("---------------------------------------\n " +
+                              "Välkommen till H5Chocolate Ordersystem  \n " +
+                             $"{catchPhrase}\n " +
+                              "---------------------------------------");
+            /* fixformat ignore:end */
+        }
 
-            chocolateDatabase.Add(chocolate);
+        private static void PrintProducts(List<Product> chocolateDatabase)
+        {
+            Console.WriteLine("Välj en produkt att lägga till: \n");
+            foreach (Chocolate c in chocolateDatabase)
+            {
+                /* fixformat ignore:start */
+                Console.Write("[");
+                Console.Write($"{chocolateDatabase.IndexOf(c)}", Color.Blue);
+                Console.Write($"] {c.Name}");
+                /* fixformat ignore:end */
+            }
 
-            Chocolate chocolate2 = new Chocolate();
-            chocolate2.name = "Hasselnötschoklad";
-            chocolate2.cacaoAmount = 4;
-            chocolate2.milkAmount = 12;
-            chocolate2.filling.Add("Hockeypulver");
-            chocolate2.filling.Add("Havregryn");
+        }
 
-            chocolateDatabase.Add(chocolate2);
+        private static List<Product> GenerateFakeProducts()
+        {
+            List<Product> chocolateDatabase = new List<Product>();
+
+            Random random = new Random();
+            for (int i = 0; i < 5; i++)
+            {
+                int cacaoAmount = random.Next(0, 100);
+                /* fixformat ignore:start */
+                var fillings = new List<string>(new string[]{"Havre","Hockeypulver","Majs"});
+                Chocolate chocolate = new Chocolate("Chocolate " + Faker.Name.Last(), cacaoAmount, 100 - cacaoAmount, fillings);
+                /* fixformat ignore:end */
+                chocolateDatabase.Add(chocolate);
+            }
 
             return chocolateDatabase;
+        }
+
+        private static List<string> GenerateFakeOrganizations()
+        {
+            var fakeOrg = new List<string>();
+
+            for (int i = 0; i < 5; i++)
+            {
+                fakeOrg.Add(Faker.Company.Name());
+            }
+            return fakeOrg;
         }
     }
 }
