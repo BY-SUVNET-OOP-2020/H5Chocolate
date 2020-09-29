@@ -9,10 +9,15 @@ namespace H5Chocolate
 {
     class Program
     {
+        const string KeyOrder = "L";
+        const string KeyQuit = "A";
+        const string KeyShowOrder = "V";
+
         static void Main()
         {
             List<Product> productDatabase = GenerateFakeProducts();
             List<string> organizationDatabase = GenerateFakeOrganizations();
+            List<Order> placedOrders = new List<Order>();
 
             Random random = new Random();
             Order order = null;
@@ -26,15 +31,26 @@ namespace H5Chocolate
 
                 string input = Console.ReadLine().ToUpper();
 
-                if (input == "B" && order == null)
+                if (input == KeyOrder && order == null)
                 {
                     ShowErrorMessage("Det finns ingen order att lägga.");
                 }
-                else if (input == "A")
+                else if (input == KeyQuit)
                 {
                     Environment.Exit(0);
                 }
-                else if (input == "B")
+                else if (input == KeyShowOrder)
+                {
+                    Console.WriteLine("--------------- \n Orders \n");
+                    foreach (var item in placedOrders)
+                    {
+                        Console.Write($"{item.Guid}: ");
+                        Console.WriteLine($"{item.status.ToString()}", Color.Green);
+                    }
+                    Console.WriteLine("\n --------------- \n");
+                    Console.ReadLine();
+                }
+                else if (input == KeyOrder)
                 {
                     order.donation = new Donation();
 
@@ -43,15 +59,17 @@ namespace H5Chocolate
 
                     int choice = ReadLineAsInt(":> ", organizationDatabase.Count - 1);
                     order.donation.Organization = organizationDatabase[choice];
-                    Console.WriteLine($"Vald organisation: {order.donation.Organization}");
+                    Console.WriteLine($"Vald organisation: {order.donation.Organization} \n");
 
-                    Console.Write("Summa: ");
+                    Console.WriteLine("Hur mycket vill du donera?");
+                    Console.Write(":> ");
                     order.donation.Amount = Convert.ToInt32(Console.ReadLine());
 
                     bool orderSuccesfull = order.Confirm();
                     if (orderSuccesfull)
                     {
                         Console.WriteLine("Beställning skickad! Tack!");
+                        placedOrders.Add(order);
                         order = null;
                         Console.ReadLine();
                     }
@@ -92,7 +110,7 @@ namespace H5Chocolate
 
         private static void PrintFooter()
         {
-            Console.WriteLine("\n[B] Lägg beställning   [A] Avsluta");
+            Console.WriteLine($"\n[{KeyOrder}] Lägg order [{KeyShowOrder}] Visa ordrar  [{KeyQuit}] Avsluta");
             Console.Write("\n:> ");
         }
 
