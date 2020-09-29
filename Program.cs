@@ -26,7 +26,15 @@ namespace H5Chocolate
 
                 string input = Console.ReadLine().ToUpper();
 
-                if (input == "B" && order != null)
+                if (input == "B" && order == null)
+                {
+                    ShowErrorMessage("Det finns ingen order att lägga.");
+                }
+                else if (input == "A")
+                {
+                    Environment.Exit(0);
+                }
+                else if (input == "B")
                 {
                     order.donation = new Donation();
 
@@ -48,32 +56,28 @@ namespace H5Chocolate
                         Console.ReadLine();
                     }
                 }
-                else if (input == "B")
-                {
-                    ShowErrorMessage("Det finns ingen order att lägga.");
-                }
-                else if (input == "A")
-                {
-                    Environment.Exit(0);
-                }
                 else // Add things to the order (numbers)
                 {
+                    int index = -1;
                     try
                     {
-                        int index = Convert.ToInt32(input);
-                        if (index > -1 && index <= productDatabase.Count - 1)
-                        {
-                            if (order == null) order = new Order();
-                            order.AddProduct(productDatabase[index]);
-                        }
-                        else
-                        {
-                            ShowErrorMessage("Du skrev nog in en för hög siffra!");
-                        }
+                        index = Convert.ToInt32(input);
                     }
                     catch
                     {
                         ShowErrorMessage("Du måste skriva en siffra, B eller A.");
+                        continue; //Hoppas tillbaka till loopens start. 
+                        //Utan continue så skrivs två felmeddelanden ut. Det ovan och det här nedanför.
+                    }
+
+                    if (index > -1 && index <= productDatabase.Count - 1)
+                    {
+                        if (order == null) order = new Order();
+                        order.AddProduct(productDatabase[index]);
+                    }
+                    else
+                    {
+                        ShowErrorMessage("Skriv en siffra mellan 0 och " + (productDatabase.Count - 1));
                     }
                 }
             }
