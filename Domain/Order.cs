@@ -5,33 +5,28 @@ namespace H5Chocolate
 {
     public class Order
     {
-        private int orderNo;
-        public int OrderNo
-        {
-            get => orderNo;
-        }
+        private Guid guid;
+        public Guid Guid { get => guid; }
 
         public OrderStatus status = OrderStatus.Pending;
 
         private List<Product> orderedItems = new List<Product>();
 
-        public string Message
-        {
-            get;
-            set;
-        }
+        public string Message { get; set; }
 
         public Donation donation;
-        //public Address adress; //TODO: Lägg till klass
+
+        //public Address shippingAdress; //TODO: Lägg till klass
         //public Package package; //TODO: Lägg till klass
+
         public int Count
         {
             get => orderedItems.Count;
         }
 
-        public Order(int ordernumber)
+        public Order()
         {
-            this.orderNo = ordernumber;
+            this.guid = Guid.NewGuid();
         }
 
         public void AddProduct(Product product)
@@ -49,23 +44,13 @@ namespace H5Chocolate
         public string GetOrderedItemsAsString()
         {
             string output = "";
-            orderedItems.ForEach(i => output += orderedItems.IndexOf(i) + " " + i.Name + "\n");
+            orderedItems.ForEach(i => output += i.Name + "\n");
             return output;
-        }
-
-        public bool HasItems()
-        {
-            return orderedItems.Count > 0;
-        }
-
-        public bool IsConfirmable()
-        {
-            return orderedItems.Count > 0 && donation != null;
         }
 
         public bool Confirm()
         {
-            if (IsConfirmable())
+            if (orderedItems.Count > 0 && donation != null)
             {
                 status = OrderStatus.Confirmed;
                 return true;

@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
-using Faker;
 using Console = Colorful.Console;
 using System.Drawing;
-using System.Runtime.Serialization;
+using System.Linq;
+using Faker;
 
 namespace H5Chocolate
 {
@@ -15,60 +15,103 @@ namespace H5Chocolate
             List<string> organizationDatabase = GenerateFakeOrganizations();
 
             Random random = new Random();
-            Order order = new Order(random.Next(1000, 100000));
+            Order order = null;
 
             while (true)
             {
                 PrintWelcomeMessage();
                 PrintProducts(productDatabase);
                 PrintCurrentOrder(order);
+                PrintFooter();
 
-                Console.WriteLine("\n[B] Lägg beställning   [A] Avsluta");
-
-                Console.Write("\n:> ");
                 string input = Console.ReadLine().ToUpper();
 
-                if (input == "B")
+                if (input == "B" && order != null)
                 {
-                    Console.WriteLine("Välj organisation att donera till:");
+                    order.donation = new Donation();
 
-                    Donation donation = new Donation("BY");
+                    Console.WriteLine("Välj organisation att donera till:\n");
+                    PrintOrganizations(organizationDatabase);
 
-                    Console.WriteLine($"Vald organisation: {donation.Organization}");
+                    int choice = ReadLineAsInt(":> ", organizationDatabase.Count - 1);
+                    order.donation.Organization = organizationDatabase[choice];
+                    Console.WriteLine($"Vald organisation: {order.donation.Organization}");
+
                     Console.Write("Summa: ");
-                    donation.amount = Convert.ToInt32(Console.ReadLine());
-
-                    order.donation = donation;
+                    order.donation.Amount = Convert.ToInt32(Console.ReadLine());
 
                     bool orderSuccesfull = order.Confirm();
                     if (orderSuccesfull)
                     {
                         Console.WriteLine("Beställning skickad! Tack!");
+                        order = null;
                         Console.ReadLine();
                     }
                 }
-                else if (input == "B" && !order.IsConfirmable())
+                else if (input == "B")
                 {
-                    Console.WriteLine("Något gick fel!", Color.Red);
+                    ShowErrorMessage("Det finns ingen order att lägga.");
                 }
                 else if (input == "A")
                 {
                     Environment.Exit(0);
                 }
-                else
+                else // Add things to the order (numbers)
                 {
-                    int index = Convert.ToInt32(input);
-                    order.AddProduct(productDatabase[index]);
+                    try
+                    {
+                        int index = Convert.ToInt32(input);
+                        if (index > -1 && index <= productDatabase.Count - 1)
+                        {
+                            if (order == null) order = new Order();
+                            order.AddProduct(productDatabase[index]);
+                        }
+                        else
+                        {
+                            ShowErrorMessage("Du skrev nog in en för hög siffra!");
+                        }
+                    }
+                    catch
+                    {
+                        ShowErrorMessage("Du måste skriva en siffra, B eller A.");
+                    }
                 }
             }
         }
 
+        private static void ShowErrorMessage(string message)
+        {
+            Console.WriteLine(message, Color.Red);
+            Console.WriteLine("Tryck <enter> för att fortsätta...");
+            Console.ReadLine();
+        }
+
+        private static void PrintFooter()
+        {
+            Console.WriteLine("\n[B] Lägg beställning   [A] Avsluta");
+            Console.Write("\n:> ");
+        }
+
+        private static void PrintOrganizations(List<string> orgs)
+        {
+            foreach (string o in orgs)
+            {
+                Console.Write("[");
+                Console.Write($"{orgs.IndexOf(o)}", Color.Blue);
+                Console.Write($"] {o} \n");
+            }
+            Console.WriteLine();
+        }
+
         private static void PrintCurrentOrder(Order order)
         {
-            Console.WriteLine("----------------------------------");
-            Console.WriteLine($"{order.Count} produkter i ordern:");
-            Console.WriteLine(order.GetOrderedItemsAsString());
-            Console.WriteLine("----------------------------------");
+            if (order != null)
+            {
+                Console.WriteLine("\n----------------------------------");
+                Console.WriteLine($"{order.Count} produkter i ordern:", Color.Blue);
+                Console.Write(order.GetOrderedItemsAsString());
+                Console.WriteLine("----------------------------------");
+            }
         }
 
         private static void PrintWelcomeMessage()
@@ -79,27 +122,36 @@ namespace H5Chocolate
             Console.WriteLine("---------------------------------------\n " +
                               "Välkommen till H5Chocolate Ordersystem  \n " +
                              $"{catchPhrase}\n " +
-                              "---------------------------------------");
+                              "---------------------------------------", Color.WhiteSmoke);
             /* fixformat ignore:end */
         }
 
-        private static void PrintProducts(List<Product> chocolateDatabase)
+        private static void PrintProducts(List<Product> productDatabase)
         {
             Console.WriteLine("Välj en produkt att lägga till: \n");
-            foreach (Chocolate c in chocolateDatabase)
+            foreach (Product product in productDatabase)
             {
-                /* fixformat ignore:start */
                 Console.Write("[");
-                Console.Write($"{chocolateDatabase.IndexOf(c)}", Color.Blue);
-                Console.Write($"] {c.Name}");
+                Console.Write($"{productDatabase.IndexOf(product)}", Color.Blue);
+
+                /* fixformat ignore:start */
+                switch (product)
+                {
+                    case Chocolate choco:
+                        Console.WriteLine($"] {choco.Name} ({choco.CacaoAmount}% cacao)");
+                        break;
+                    
+                    case Product prod:
+                        Console.WriteLine($"] {prod.Name}");
+                        break;
+                }
                 /* fixformat ignore:end */
             }
-
         }
 
         private static List<Product> GenerateFakeProducts()
         {
-            List<Product> chocolateDatabase = new List<Product>();
+            List<Product> productDatabase = new List<Product>();
 
             Random random = new Random();
             for (int i = 0; i < 5; i++)
@@ -109,10 +161,13 @@ namespace H5Chocolate
                 var fillings = new List<string>(new string[]{"Havre","Hockeypulver","Majs"});
                 Chocolate chocolate = new Chocolate("Chocolate " + Faker.Name.Last(), cacaoAmount, 100 - cacaoAmount, fillings);
                 /* fixformat ignore:end */
-                chocolateDatabase.Add(chocolate);
+                productDatabase.Add(chocolate);
             }
 
-            return chocolateDatabase;
+            Product product = new Product { ID = 0, Name = "Slips" };
+            productDatabase.Add(product);
+
+            return productDatabase;
         }
 
         private static List<string> GenerateFakeOrganizations()
@@ -124,6 +179,30 @@ namespace H5Chocolate
                 fakeOrg.Add(Faker.Company.Name());
             }
             return fakeOrg;
+        }
+
+        private static int ReadLineAsInt(string prompt, int maxValue = -1)
+        {
+            int output = -1;
+            bool success = false;
+
+            do
+            {
+                Console.Write(prompt);
+                string input = Console.ReadLine();
+                try
+                {
+                    output = Convert.ToInt32(input);
+                    if ((maxValue == -1 || output <= maxValue) && output >= 0) success = true;
+                    else Console.WriteLine("Skriv en siffra mellan 0 - " + maxValue, Color.Red);
+                }
+                catch
+                {
+                    Console.WriteLine("Du måste skriva en siffra.", Color.Red);
+                }
+            } while (!success);
+
+            return output;
         }
     }
 }
