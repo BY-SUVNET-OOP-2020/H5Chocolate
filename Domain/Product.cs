@@ -1,13 +1,13 @@
-    public class Product
+public class Product
+{
+    public int ID
     {
-        public int ID
-        {
-            get;
-            set;
-        }
-        public string Name
-        {
-            get;
-            set;
-        }
+        get;
+        set;
     }
+    public string Name
+    {
+        get;
+        set;
+    }
+}

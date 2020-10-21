@@ -15,6 +15,7 @@ namespace H5Chocolate
 
         static void Main()
         {
+            //All this would be in a real persistent database
             List<Product> productDatabase = GenerateFakeProducts();
             List<string> organizationDatabase = GenerateFakeOrganizations();
             List<Order> placedOrders = new List<Order>();
@@ -76,26 +77,21 @@ namespace H5Chocolate
                 }
                 else // Add things to the order (numbers)
                 {
-                    int index = -1;
-                    try
+                    if (Int32.TryParse(input, out int index))
                     {
-                        index = Convert.ToInt32(input);
-                    }
-                    catch
-                    {
-                        ShowErrorMessage("Du måste skriva en siffra, B eller A.");
-                        continue; //Hoppas tillbaka till loopens start. 
-                        //Utan continue så skrivs två felmeddelanden ut. Det ovan och det här nedanför.
-                    }
-
-                    if (index > -1 && index <= productDatabase.Count - 1)
-                    {
-                        if (order == null) order = new Order();
-                        order.AddProduct(productDatabase[index]);
+                        if (index > -1 && index <= productDatabase.Count - 1)
+                        {
+                            if (order == null) order = new Order();
+                            order.AddProduct(productDatabase[index]);
+                        }
+                        else
+                        {
+                            ShowErrorMessage("Skriv en siffra mellan 0 och " + (productDatabase.Count - 1));
+                        }
                     }
                     else
                     {
-                        ShowErrorMessage("Skriv en siffra mellan 0 och " + (productDatabase.Count - 1));
+                        ShowErrorMessage("Du måste skriva en siffra, B eller A.");
                     }
                 }
             }
@@ -179,10 +175,8 @@ namespace H5Chocolate
             for (int i = 0; i < 5; i++)
             {
                 int cacaoAmount = random.Next(0, 100);
-                /* fixformat ignore:start */
-                var fillings = new List<string>(new string[]{"Havre","Hockeypulver","Majs"});
+                var fillings = new List<string>(new string[] { "Havre", "Hockeypulver", "Majs" });
                 Chocolate chocolate = new Chocolate("Chocolate " + Faker.Name.Last(), cacaoAmount, 100 - cacaoAmount, fillings);
-                /* fixformat ignore:end */
                 productDatabase.Add(chocolate);
             }
 
@@ -203,7 +197,7 @@ namespace H5Chocolate
             return fakeOrg;
         }
 
-        private static int ReadLineAsInt(string prompt, int maxValue = -1)
+        static int ReadLineAsInt(string prompt, int maxValue = -1)
         {
             int output = -1;
             bool success = false;

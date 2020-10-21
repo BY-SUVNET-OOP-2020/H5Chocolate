@@ -19,10 +19,7 @@ namespace H5Chocolate
         //public Address shippingAdress; //TODO: Lägg till klass
         //public Package package; //TODO: Lägg till klass
 
-        public int Count
-        {
-            get => orderedItems.Count;
-        }
+        public int Count { get => orderedItems.Count; }
 
         public Order()
         {
@@ -32,13 +29,11 @@ namespace H5Chocolate
         public void AddProduct(Product product)
         {
             orderedItems.Add(product);
-            Console.WriteLine($"[{product.Name} ordered]");
         }
 
         public void RemoveProduct(Product product)
         {
             orderedItems.Add(product);
-            Console.WriteLine($"[{product.Name} removed]");
         }
 
         public string GetOrderedItemsAsString()
